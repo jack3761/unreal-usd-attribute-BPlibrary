@@ -2,8 +2,14 @@
 
 #pragma once
 
+#include "USDIncludesStart.h"
+#include <pxr/base/vt/value.h>
+// #include "USDIncludesEnd.h"
+
+
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "UsdAttributeFunctionLibraryBPLibrary.generated.h"
+
 
 /* 
 *	Function library class.
@@ -29,6 +35,11 @@ namespace UE
 	class FUsdAttribute;
 	class FVtValue;
 }
+//
+// namespace pxr
+// {
+// 	class VtValue;
+// }
 
 class AUsdStageActor;
 
@@ -47,9 +58,14 @@ public:
 	template <typename T>
 	static T GetUsdAttributeValueInternal(AUsdStageActor* StageActor, FString PrimName, FString AttrName);
 
-
 	template <typename T>
 	static T GetUsdAnimatedAttributeValueInternal(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
+
+	template <typename T>
+	FVector ConvertUsdVectorToFVector(const pxr::VtValue& pxrValue);
+
+	
+	FVector GetUsdVec3AttributeValueInternal(AUsdStageActor* StageActor, FString PrimName, FString AttrName);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UsdAttributes")
 	static float GetUsdFloatAttribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName);

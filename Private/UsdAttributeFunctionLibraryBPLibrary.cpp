@@ -11,6 +11,7 @@
 #include "UsdWrappers/UsdPrim.h"
 #include "pxr/pxr.h"
 #include "pxr/base/vt/value.h"
+#include "pxr/base/tf/type.h"
 #include "USDIncludesEnd.h"
 
 UUsdAttributeFunctionLibraryBPLibrary::UUsdAttributeFunctionLibraryBPLibrary(const FObjectInitializer& ObjectInitializer)
@@ -134,6 +135,49 @@ T UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedAttributeValueInternal(
 	return ExtractAttributeValue<T>(Value);
 }
 
+template <typename T>
+FVector UUsdAttributeFunctionLibraryBPLibrary::ConvertUsdVectorToFVector(const pxr::VtValue& pxrValue)
+{
+	T pxrVec = pxrValue.Get<T>();
+	return FVector(static_cast<double>(pxrVec[0]), static_cast<double>(pxrVec[1]), static_cast<double>(pxrVec[2]));
+}
+
+FVector UUsdAttributeFunctionLibraryBPLibrary::GetUsdVec3AttributeValueInternal(AUsdStageActor* StageActor, FString PrimName,
+                                                                                FString AttrName)
+{
+	UE::FUsdAttribute Attr = GetUsdAttributeInternal(StageActor, PrimName, AttrName);
+
+	UE::FVtValue Value;
+
+	bool bSuccess = Attr.Get(Value);
+
+	if (!bSuccess)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to get animated value for Attribute: %s"), *Attr.GetName().ToString());
+		return FVector();
+	}
+
+	pxr::VtValue& PxrValue = Value.GetUsdValue();
+	pxr::TfType PxrValueType = PxrValue.GetType();
+
+	if (PxrValueType.IsA<pxr::GfVec3f>()) {
+		UE_LOG(LogTemp, Warning, TEXT("Vec3f"));
+	
+		return ConvertUsdVectorToFVector<pxr::GfVec3f>(PxrValue);
+	} else if (PxrValueType.IsA<pxr::GfVec3d>()) {
+		UE_LOG(LogTemp, Warning, TEXT("Vec3d"));
+	
+		return ConvertUsdVectorToFVector<pxr::GfVec3d>(PxrValue);
+	} else if (PxrValueType.IsA<pxr::GfVec3i>()) {
+		UE_LOG(LogTemp, Warning, TEXT("Vec3i"));
+	
+		return ConvertUsdVectorToFVector<pxr::GfVec3i>(PxrValue);
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("Unsupported type for Attribute."));
+		return FVector();
+	}
+
+}
 
 
 float UUsdAttributeFunctionLibraryBPLibrary::GetUsdFloatAttribute(AUsdStageActor* StageActor, FString PrimName,
@@ -217,3 +261,7 @@ template double UUsdAttributeFunctionLibraryBPLibrary::GetUsdAttributeValueInter
 template float UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedAttributeValueInternal<float>(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
 template int UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedAttributeValueInternal<int>(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
 template double UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedAttributeValueInternal<double>(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
+
+template FVector UUsdAttributeFunctionLibraryBPLibrary::ConvertUsdVectorToFVector<pxr::GfVec3f>(const pxr::VtValue& pxrValue);
+template FVector UUsdAttributeFunctionLibraryBPLibrary::ConvertUsdVectorToFVector<pxr::GfVec3d>(const pxr::VtValue& pxrValue);
+template FVector UUsdAttributeFunctionLibraryBPLibrary::ConvertUsdVectorToFVector<pxr::GfVec3i>(const pxr::VtValue& pxrValue);
