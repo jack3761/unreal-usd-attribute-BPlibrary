@@ -11,7 +11,11 @@
 #include "UsdWrappers/UsdPrim.h"
 #include "pxr/pxr.h"
 #include "pxr/base/vt/value.h"
+#include "pxr/base/vt/types.h"
 #include "pxr/base/tf/type.h"
+#include "pxr/base/gf/vec3f.h"
+#include "pxr/base/gf/vec3d.h"
+#include "pxr/base/gf/vec3i.h"
 #include "USDIncludesEnd.h"
 
 UUsdAttributeFunctionLibraryBPLibrary::UUsdAttributeFunctionLibraryBPLibrary(const FObjectInitializer& ObjectInitializer)
@@ -142,7 +146,7 @@ FVector UUsdAttributeFunctionLibraryBPLibrary::ConvertUsdVectorToFVector(const p
 	return FVector(static_cast<double>(pxrVec[0]), static_cast<double>(pxrVec[1]), static_cast<double>(pxrVec[2]));
 }
 
-FVector UUsdAttributeFunctionLibraryBPLibrary::GetUsdVec3AttributeValueInternal(AUsdStageActor* StageActor, FString PrimName,
+FVector UUsdAttributeFunctionLibraryBPLibrary::GetUsdVec3Attribute(AUsdStageActor* StageActor, FString PrimName,
                                                                                 FString AttrName)
 {
 	UE::FUsdAttribute Attr = GetUsdAttributeInternal(StageActor, PrimName, AttrName);

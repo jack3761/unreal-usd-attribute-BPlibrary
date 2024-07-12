@@ -62,10 +62,10 @@ public:
 	static T GetUsdAnimatedAttributeValueInternal(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
 
 	template <typename T>
-	FVector ConvertUsdVectorToFVector(const pxr::VtValue& pxrValue);
+	static FVector ConvertUsdVectorToFVector(const pxr::VtValue& pxrValue);
 
-	
-	FVector GetUsdVec3AttributeValueInternal(AUsdStageActor* StageActor, FString PrimName, FString AttrName);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UsdAttributes")
+	static FVector GetUsdVec3Attribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UsdAttributes")
 	static float GetUsdFloatAttribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName);
