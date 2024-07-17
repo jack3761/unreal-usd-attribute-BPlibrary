@@ -146,8 +146,9 @@ FVector UUsdAttributeFunctionLibraryBPLibrary::ConvertUsdVectorToFVector(const p
 	return FVector(static_cast<double>(pxrVec[0]), static_cast<double>(pxrVec[1]), static_cast<double>(pxrVec[2]));
 }
 
+
 FVector UUsdAttributeFunctionLibraryBPLibrary::GetUsdVec3Attribute(AUsdStageActor* StageActor, FString PrimName,
-                                                                                FString AttrName)
+                                                                   FString AttrName)
 {
 	UE::FUsdAttribute Attr = GetUsdAttributeInternal(StageActor, PrimName, AttrName);
 
@@ -180,7 +181,6 @@ FVector UUsdAttributeFunctionLibraryBPLibrary::GetUsdVec3Attribute(AUsdStageActo
 		UE_LOG(LogTemp, Warning, TEXT("Unsupported type for Attribute."));
 		return FVector();
 	}
-
 }
 
 
@@ -203,8 +203,44 @@ int UUsdAttributeFunctionLibraryBPLibrary::GetUsdIntAttribute(AUsdStageActor* St
 	return GetUsdAttributeValueInternal<int>(StageActor, PrimName, AttrName);
 }
 
-float UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedFloatAttribute(AUsdStageActor* StageActor, FString PrimName,
+FVector UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedVec3Attribute(AUsdStageActor* StageActor, FString PrimName,
 	FString AttrName, double TimeSample)
+{
+	UE::FUsdAttribute Attr = GetUsdAttributeInternal(StageActor, PrimName, AttrName);
+
+	UE::FVtValue Value;
+
+	bool bSuccess = Attr.Get(Value, TimeSample);
+
+	if (!bSuccess)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to get animated value for Attribute: %s"), *Attr.GetName().ToString());
+		return FVector();
+	}
+
+	pxr::VtValue& PxrValue = Value.GetUsdValue();
+	pxr::TfType PxrValueType = PxrValue.GetType();
+
+	if (PxrValueType.IsA<pxr::GfVec3f>()) {
+		UE_LOG(LogTemp, Warning, TEXT("Vec3f"));
+	
+		return ConvertUsdVectorToFVector<pxr::GfVec3f>(PxrValue);
+	} else if (PxrValueType.IsA<pxr::GfVec3d>()) {
+		UE_LOG(LogTemp, Warning, TEXT("Vec3d"));
+	
+		return ConvertUsdVectorToFVector<pxr::GfVec3d>(PxrValue);
+	} else if (PxrValueType.IsA<pxr::GfVec3i>()) {
+		UE_LOG(LogTemp, Warning, TEXT("Vec3i"));
+	
+		return ConvertUsdVectorToFVector<pxr::GfVec3i>(PxrValue);
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("Unsupported type for Attribute."));
+		return FVector();
+	}
+}
+
+float UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedFloatAttribute(AUsdStageActor* StageActor, FString PrimName,
+                                                                          FString AttrName, double TimeSample)
 {
 	return GetUsdAnimatedAttributeValueInternal<float>(StageActor, PrimName, AttrName, TimeSample);
 }
@@ -219,6 +255,11 @@ int UUsdAttributeFunctionLibraryBPLibrary::GetUsdAnimatedIntAttribute(AUsdStageA
 	FString AttrName, double TimeSample)
 {
 	return GetUsdAnimatedAttributeValueInternal<int>(StageActor, PrimName, AttrName, TimeSample);
+}
+
+FRotator UUsdAttributeFunctionLibraryBPLibrary::ConvertToUnrealRotator(FVector InputVector)
+{
+	return FRotator(InputVector[0], (InputVector[1]*-1)-90, InputVector[2]);
 }
 
 

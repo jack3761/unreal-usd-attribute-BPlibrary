@@ -77,6 +77,9 @@ public:
 	static int GetUsdIntAttribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UsdAttributes")
+	static FVector GetUsdAnimatedVec3Attribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UsdAttributes")
 	static float GetUsdAnimatedFloatAttribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UsdAttributes")
@@ -85,6 +88,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "USD Attributes")
 	static int GetUsdAnimatedIntAttribute(AUsdStageActor* StageActor, FString PrimName, FString AttrName, double TimeSample);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "USD Attributes")
+	static FRotator ConvertToUnrealRotator(FVector InputVector);
 
 	static void GetSdfPathWithName(UE::FUsdPrim& CurrentPrim, FString TargetName, UE::FSdfPath& OutPath);
 
